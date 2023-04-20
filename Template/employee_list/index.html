@@ -1,0 +1,32 @@
+{% extends "employee_list/base.html" %}
+
+{% block content %}
+社員検索
+<form>
+    {{ form }}
+    <input type="submit" value="検索">
+</form>
+<hr>
+<h3>社員一覧</h3>
+<a href="{% url 'emp_add' %}">追加</a>
+<table border="1">
+    <th>社員番号</th>
+    <th>名前</th>
+    <th>役職</th>
+    <th>入社日</th>
+    <th>所属</th>
+    {% for emp in employees %}
+
+    <tr>
+        <td>{{ emp.emp_id }}</td>
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.post }}</td>
+        <td>{{ emp.date_of_entry }}</td>
+        <td>{{ emp.branch }}</td>
+        <td><a href="{% url 'emp_edit' emp.pk %}">編集</a></td>
+    </tr>
+
+    {% endfor %}
+</table>
+<a href="{% url 'branch_view' %}">支社編集</a>
+{% endblock %}

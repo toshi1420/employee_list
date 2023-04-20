@@ -1,0 +1,20 @@
+{% extends "employee_list/base.html" %}
+
+{% block content %}
+<h3>支社一覧</h3>
+<a href="{% url 'branch_add' %}">追加</a>
+<table border="1">
+    <th>支社名</th>
+    <th>住所</th>
+    <th>電話番号</th>
+    {% for brn in branchs %}
+
+    <tr>
+        <td>{{ brn.name }}</td>
+        <td>{{ brn.address }}</td>
+        <td>{{ brn.tel }}</td>
+        <td><a href="{% url 'branch_edit' brn.pk %}">編集</a></td>
+    </tr>
+
+    {% endfor %}
+    {% endblock %}

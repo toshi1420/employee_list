@@ -1,0 +1,15 @@
+{% extends "employee_list/base.html" %}
+
+{% block content %}
+<h3>支社編集</h3>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="更新">
+</form>
+<form action="{% url 'branch_delete' branch.pk %}" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="削除">
+</form>
+
+{% endblock %}
