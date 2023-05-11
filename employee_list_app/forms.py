@@ -1,3 +1,4 @@
+from datetime import date
 from django import forms
 
 from .models import Employee, Branch
@@ -7,23 +8,24 @@ class EmpForm(forms.ModelForm):
     class Meta:
         # モデル情報と紐付け
         model = Employee
-        fields = ("emp_id", "name", "post", "date_of_entry", "branch")  # 扱うフィールドを指定
+        # 扱うフィールドを指定
+        fields = ("emp_id", "name", "post", "date_of_entry", "branch")
         labels = {"emp_id": "社員番号", "name": "名前", "post": "役職", "date_of_entry": "入社日", "branch": "所属"}
         widgets = {
-            'date_of_entry': forms.NumberInput(attrs={
-                "type": "date"
+            "emp_id": forms.NumberInput(attrs={"min": 10000, "max": 19999}),
+            "date_of_entry": forms.NumberInput(attrs={
+                "type": "date", "max": date.today()
             })
         }
 
 
 class EmpSearchForm(forms.ModelForm):
-    name = forms.CharField(label="名前", required=False)
-    branch = forms.ModelChoiceField(queryset=Branch.objects.all(), label="支社", required=False)
+    name = forms.CharField(required=False)
+    branch = forms.ModelChoiceField(queryset=Branch.objects.all(), required=False)
 
     class Meta:
         model = Employee
         fields = ("name", "branch")
-        # labels = {"name": "名前", "branch": "支社名"}
 
 
 class BranchForm(forms.ModelForm):

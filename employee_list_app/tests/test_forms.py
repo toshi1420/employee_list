@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from employee_list_app.models import Branch
 
-from ..forms import EmpForm, EmpSearchForm, BranchForm
+from ..forms import BranchForm, EmpForm, EmpSearchForm
 
 
 class TestEmpForm(TestCase):

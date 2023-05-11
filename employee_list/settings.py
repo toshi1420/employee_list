@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
-# django-environをインポート
 import environ
+# django-environをインポート
+
 
 # BASE_DIRを指定する。（environのところで必要なため記述）
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,10 +11,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# シークレットキーを環境変数から引っ張ります。
-SECRET_KEY = env('SECRET_KEY')
+# シークレットキーを環境変数から引っ張る。
+SECRET_KEY = env("SECRET_KEY")
 
-# 本番環境ではFasleに変更します。
+# 本番環境ではFasleに変更。
 DEBUG = env("DEBUG")
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'employee_list_app',
+    'widget_tweaks',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

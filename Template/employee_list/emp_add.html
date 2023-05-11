@@ -1,11 +1,23 @@
 {% extends "employee_list/base.html" %}
-
+{% load widget_tweaks %}
 {% block content %}
-<h3>社員追加</h3>
-<form action="{% url 'emp_add' %}" method="POST">
+
+<h3 class="text-center">社員追加</h3>
+<form class="offset-md-3 col-md-6 justify-content-center" action="{% url 'emp_add' %}" method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="登録">
+    <label class="form-label">社員番号</label>
+    {% render_field form.emp_id class="form-control"%}
+    <label class="form-label">名前</label>
+    {% render_field form.name class="form-control"%}
+    <label class="form-label">役職</label>
+    {% render_field form.post class="form-control"%}
+    <label class="form-label">入社日</label>
+    {% render_field form.date_of_entry class="form-control"%}
+    <label class="form-label">所属</label>
+    {% render_field form.branch class="form-select"%}
+    <div class="d-inline-flex flex-column">
+        <button type="submit" class="btn btn-outline-primary btn-sm mt-2">登録</button>
 </form>
-<a href="{% url 'index' %}">戻る</a>
+<a class="btn btn-outline-primary btn-sm mt-2 mb-3" href="{% url 'index' %}">戻る</a>
+</div>
 {% endblock %}
