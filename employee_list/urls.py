@@ -10,3 +10,7 @@ urlpatterns = [
     # アプリケーション管理フォルダのurls.pyと関連づけるpath
     path('', include('employee_list_app.urls')),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]

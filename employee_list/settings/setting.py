@@ -5,7 +5,7 @@ import environ
 
 
 # BASE_DIRを指定する。（environのところで必要なため記述）
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # environの設定をする
 env = environ.Env()
@@ -15,11 +15,11 @@ env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env("SECRET_KEY")
 
 # 本番環境ではFasleに変更。
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG")
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Tepmpateフォルダへの絶対パスを定義
 TEMPLATE_DIR = BASE_DIR / "Template"
@@ -31,7 +31,7 @@ STATIC_DIR = BASE_DIR / "static"
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
@@ -45,8 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'employee_list_app',
     'widget_tweaks',
+    'debug_toolbar',
 ]
 
+INTERNAL_IPS = ['127.0.0.1']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'employee_list.urls'
