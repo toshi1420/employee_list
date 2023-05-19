@@ -10,6 +10,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>社員表</title>
+    {% block head %}
+    {% endblock head %}
 </head>
 
 <body>
@@ -18,9 +20,17 @@
             <div class="text-center mt-2" style="font-size: 1.5em">
                 社員一覧表
             </div>
-            <div class="text-end me-1">
-                <a class=" btn btn-outline-primary btn-sm" href="{% url 'index' %}" role="button">社員一覧</a>
-            </div>
+            <span>
+                {% if user.is_authenticated %}
+                <a class="btn btn-outline-primary btn-sm text-start" href="{% url 'account_logout' %}">ログアウト</a>
+                {% else %}
+                <a class="btn btn-outline-primary btn-sm text-start" href="{% url 'account_signup' %}">サインイン</a>
+                <a class="btn btn-outline-primary btn-sm text-start" href="{% url 'account_login' %}">ログイン</a>
+                {% endif %}
+                <div class="text-end me-1">
+                    <a class=" btn btn-outline-primary btn-sm" href="{% url 'index' %}" role="button">社員一覧</a>
+                </div>
+            </span>
             <hr>
         </div>
     </header>
