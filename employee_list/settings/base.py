@@ -1,4 +1,5 @@
 import os
+from django.contrib.messages import constants as messages
 from pathlib import Path
 # django-environをインポート
 import environ
@@ -36,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,36 +45,35 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'employee_list_app',
-    'users',
-    'django.contrib.sites',  # allauth
-    'allauth',  # allauth
-    'allauth.account',  # allauth
-    'allauth.socialaccount',  # allauth
+    # 'django.contrib.sites',  # allauth
+    # 'allauth',  # allauth
+    # 'allauth.account',  # allauth
+    # 'allauth.socialaccount',  # allauth
     'widget_tweaks',
 ]
 # django.contrib.sites用のサイト識別IDを設定
-SITE_ID = 1
+# SITE_ID = 1
 # 認証バックエンドの設定
-AUTHENTICATION_BACKENDS = [
-    'allauth.account.auth_backends.AuthenticationBackend',  # 一般ユーザー用(メールアドレス認証)
-    'django.contrib.auth.backends.ModelBackend',  # 管理サイト用(ユーザー名認証)
-]
+# AUTHENTICATION_BACKENDS = [
+#     'allauth.account.auth_backends.AuthenticationBackend',  # 一般ユーザー用(メールアドレス認証)
+#     'django.contrib.auth.backends.ModelBackend',  # 管理サイト用(ユーザー名認証)
+# ]
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'  # メールアドレス認証に変更する設定
-ACCOUNT_USERNAME_REQUIRED = False  # サインナップ、ログイン時のユーザーネーム認証をキャンセル
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'  # メールアドレス認証に変更する設定
+# ACCOUNT_USERNAME_REQUIRED = False  # サインナップ、ログイン時のユーザーネーム認証をキャンセル
 
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # サインアップにメールアドレス確認を使用
-ACCOUNT_EMAIL_REQUIRED = True  # ユーザー登録画面でメールアドレスを必須項目に
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # サインアップにメールアドレス確認を使用
+# ACCOUNT_EMAIL_REQUIRED = True  # ユーザー登録画面でメールアドレスを必須項目に
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # ローカルでの開発のためメールをコンソールで表示する
+EMAIL_BACKEND = ''
 
 LOGIN_REDIRECT_URL = '/'  # ログイン成功後の遷移先の指定
-ACCOUNT_LOGOUT_REDIRECT_URL = '/account/login/'  # ログアウト成功後の遷移先の指定
-LOGIN_URL = '/account/login/'  # 非ログイン状態でアクセスした際のリダイレクト先
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # ログアウト成功後の遷移先の指定 allauathはACCOUNTS_を付ける
+LOGIN_URL = '/accounts/login/'  # 非ログイン状態でアクセスした際のリダイレクト先
 
-ACCOUNT_LOGOUT_ON_GET = True  # 確認を行わずログアウトする設定
+# ACCOUNT_LOGOUT_ON_GET = True  # 確認を行わずログアウトする設定
 
-AUTH_USER_MODEL = "users.CustomUser"  # 認証時に、参照するユーザーモデルを指定する
+AUTH_USER_MODEL = "users.EmpListUser"  # 認証時に、参照するユーザーモデルを指定する
 
 # ACCOUNT_FORMS = {"signup": "users.forms.SignupForm"}
 
@@ -94,7 +95,7 @@ ROOT_URLCONF = 'employee_list.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR, BASE_DIR / "users/Template"],  # 追加
+        'DIRS': [TEMPLATE_DIR, ],  # 追加
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,6 +140,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+MESSAGE_TAGS = {
+    messages.INFO: 'alert alert-info',
+    messages.SUCCESS: 'alert alert-success',
+    messages.WARNING: 'alert alert-warning',
+    messages.ERROR: 'alert alert-danger',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -164,7 +171,8 @@ STATICFIELES_DIRS = [
 
 PUBLIC_PATHS = [
     "/admin/",
-    "/account/login/",
-    "/account/signup/",
-    "/account/password/reset/",
+    "/accounts/login/",
+    "/signup/",
+    "/accounts/password_reset/",
+    "/accounts/reset/",
 ]

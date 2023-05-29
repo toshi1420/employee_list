@@ -11,3 +11,5 @@ MIDDLEWARE += [  # noqa: F405
 ]
 
 INTERNAL_IPS += ['127.0.0.1',]  # noqa: F405
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # ローカルでの開発のためメールをコンソールで表示する

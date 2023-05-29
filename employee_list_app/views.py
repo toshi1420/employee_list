@@ -3,7 +3,6 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-
 from .models import Employee, Branch
 from .forms import EmpForm, EmpSearchForm, BranchForm
 
@@ -29,7 +28,10 @@ def index(request):
 
 def emp_add(request):
     if request.method == "GET":
-        last_emp_id = Employee.objects.all().order_by("emp_id").last().emp_id + 1
+        if Employee.objects.exists():
+            last_emp_id = Employee.objects.all().order_by("emp_id").last().emp_id + 1
+        else:
+            last_emp_id = 10000
         initial = {'emp_id': last_emp_id}
         form = EmpForm(initial=initial)
         return TemplateResponse(request, "employee_list/emp_add.html",

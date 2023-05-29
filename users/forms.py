@@ -1,11 +1,11 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-CustomUser = get_user_model()
+user = get_user_model()
 
 
 class SignupForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         # カスタムユーザーを使用
-        model = CustomUser
-        fields = ("username", "email")
+        model = user
+        fields = ("email",)
