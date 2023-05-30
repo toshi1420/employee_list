@@ -1,34 +1,60 @@
-from django.forms.models import BaseModelForm
+from typing import Any, Dict
+from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.urls import reverse_lazy
-from django.shortcuts import render
 from django.contrib import messages
 from .models import Employee, Branch
 from .forms import EmpForm, EmpSearchForm, BranchForm
 
-from django.views.generic import View, CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 
 
-class Index(View):
-    def get(self, request, *args, **kwargs):
-        #   社員テーブルから全て取得
-        employees = Employee.objects.all().order_by("branch")
-        form = EmpSearchForm(request.GET)
+class Index(ListView):
+    template_name = "employee_list/index.html"
+    model = Employee
+    context_object_name = "employees"
+    ordering = "branch"
+    paginate_by = 10
+
+    def get_queryset(self) -> QuerySet[Any]:
+        queryset = super().get_queryset()
+        form = EmpSearchForm(self.request.GET)
         if form.is_valid():
             # バリデーションを通ったデータはcleaned_dataに入るので "name", "branch"　を取り出す
             name = form.cleaned_data.get("name")
             branch = form.cleaned_data.get("branch")
             # name にデータがあれば　name に部分一致するデータを取り出す
             if name:
-                employees = employees.filter(name__icontains=name)
+                queryset = queryset.filter(name__icontains=name)
             # branch にデータがあれば　branch に一致する　branch を取り出すが、djangoは外部キーフィールドに自動で_idを付けるので branch_id　になる
             if branch:
-                employees = employees.filter(branch_id=branch)
-        context = {
-            "employees": employees.select_related("branch"),
-            "form": form
-        }
-        return render(request, "employee_list/index.html", context)
+                queryset = queryset.filter(branch_id=branch)
+        return queryset.select_related("branch")
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["form"] = EmpSearchForm(self.request.GET)
+        return context
+
+    # def get(self, request, *args, **kwargs):
+    #     #   社員テーブルから全て取得
+    #     employees = Employee.objects.all().order_by("branch")
+    #     form = EmpSearchForm(request.GET)
+    #     if form.is_valid():
+    #         # バリデーションを通ったデータはcleaned_dataに入るので "name", "branch"　を取り出す
+    #         name = form.cleaned_data.get("name")
+    #         branch = form.cleaned_data.get("branch")
+    #         # name にデータがあれば　name に部分一致するデータを取り出す
+    #         if name:
+    #             employees = employees.filter(name__icontains=name)
+    #         # branch にデータがあれば　branch に一致する　branch を取り出すが、djangoは外部キーフィールドに自動で_idを付けるので branch_id　になる
+    #         if branch:
+    #             employees = employees.filter(branch_id=branch)
+    #     context = {
+    #         "employees": employees.select_related("branch"),
+    #         "form": form
+    #     }
+    #     return render(request, "employee_list/index.html", context)
 
 
 index = Index.as_view()
@@ -103,7 +129,7 @@ class EmpAdd(CreateView):
 class EmpEdit(UpdateView):
     template_name = "employee_list/emp_edit.html"
     model = Employee
-    fields = "__all__"
+    form_class = EmpForm
     success_url = reverse_lazy("index")
 
     def form_valid(self, form: EmpForm) -> HttpResponse:
@@ -140,7 +166,7 @@ class EmpDelete(DeleteView):
     model = Employee
     success_url = reverse_lazy("index")
 
-    def form_valid(self, form: EmpForm) -> HttpResponse:
+    def form_valid(self, form) -> HttpResponse:
         messages.success(self.request, "データを削除しました")
         return super().form_valid(form)
 
@@ -201,7 +227,7 @@ class BranchEdit(UpdateView):
 class BranchAdd(CreateView):
     template_name = "employee_list/branch_add.html"
     model = Branch
-    fields = "__all__"
+    form_class = BranchForm
     success_url = reverse_lazy("index")
 
     def form_valid(self, form: BranchForm) -> HttpResponse:
@@ -234,7 +260,7 @@ class BranchDelete(DeleteView):
     model = Branch
     success_url = reverse_lazy("index")
 
-    def form_valid(self, form: BranchForm) -> HttpResponse:
+    def form_valid(self, form) -> HttpResponse:
         messages.success(self.request, "データを削除しました")
         return super().form_valid(form)
 
