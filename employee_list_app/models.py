@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Branch(models.Model):
     name = models.CharField(max_length=30, verbose_name="支社名")
     address = models.CharField(max_length=255, verbose_name="住所")
-    tel = models.CharField(max_length=11, verbose_name="電話番号")
+    tel = models.IntegerField(max_length=11, verbose_name="電話番号")
 
     def __str__(self):
         return self.name

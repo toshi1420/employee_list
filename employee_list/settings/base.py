@@ -68,9 +68,9 @@ INSTALLED_APPS = [
 EMAIL_BACKEND = ''
 
 LOGIN_REDIRECT_URL = '/'  # ログイン成功後の遷移先の指定
-LOGOUT_REDIRECT_URL = '/accounts/login/'  # ログアウト成功後の遷移先の指定 allauathはACCOUNTS_を付ける
+SITE_LOGOUT_REDIRECT_URL = '/accounts/login/'  # ログアウト成功後の遷移先の指定 allauathはACCOUNTS_を付ける
 LOGIN_URL = '/accounts/login/'  # 非ログイン状態でアクセスした際のリダイレクト先
-
+ADMIN_LOGOUT_REDIRECT_URL = "/admin/login/"  # adminサイトからログアウトした時のリダイレクト先
 # ACCOUNT_LOGOUT_ON_GET = True  # 確認を行わずログアウトする設定
 
 AUTH_USER_MODEL = "users.EmpListUser"  # 認証時に、参照するユーザーモデルを指定する
