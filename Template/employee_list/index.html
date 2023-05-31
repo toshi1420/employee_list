@@ -1,11 +1,10 @@
 {% extends "base.html" %}
+{% block title %}社員表{% endblock title %}
 {% load widget_tweaks %}
 {% block content %}
-<a href="{% url 'password_change' %}">パスワード変更</a>
 
 <nav class="navbar" style="background-color: #e3f2fd;">
-    <div class="container">
-        <span class="navber-brand col-auto">社員検索</span>
+    <div class="container justify-content-end">
         <form>
             <div class="row g-1">
                 <div class="col-auto">
@@ -25,7 +24,7 @@
 <hr>
 <h3 class="text-center">社員一覧</h3>
 <div class="text-end">
-    <a class="btn btn-outline-primary btn-sm col-auto mb-2" href="{% url 'emp_add' %}" role="button">社員追加</a>
+    <a class="btn btn-outline-primary btn-sm col-auto mb-2" href="{% url 'emp_add' %}" role="button">社員登録</a>
 </div>
 
 <div class="justify-content-center">
@@ -49,7 +48,7 @@
         {% endfor %}
     </table>
 </div>
-<div class="pagination">
+<div class="pagination justify-content-end">
     <span>
         {% if page_obj.has_previous %}
         <a href="?page=1">&laquo; 先頭</a>
@@ -68,6 +67,6 @@
 </div>
 
 <a class="btn btn-outline-primary btn-sm col-auto mb-2" href="{% url 'branch_view' %}"><i
-        class="bi bi-building"></i>支社編集</a>
+        class="bi bi-building"></i>支社一覧</a>
 
 {% endblock %}

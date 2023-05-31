@@ -2,6 +2,8 @@ from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
 
 from .forms import SignupForm
 
@@ -17,7 +19,17 @@ class SignupView(SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         """ ユーザー登録後に自動でログインさせる """
-        # self.objectにsave()されたUserオブジェクトが入る
-        valid = super().form_valid(form)
         login(self.request, self.object)
-        return valid
+        return super().form_valid(form)
+
+
+class CustomLoginView(LoginView):
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get("username")
+        messages.success(self.request, f'"{username}" ログインしました。')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'ログインに失敗しました。正しいメールアドレスとパスワードを入力してください。')
+        return super().form_invalid(form)

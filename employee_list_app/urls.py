@@ -17,6 +17,7 @@ urlpatterns = [
     path("emp_add", EmpAdd.as_view(), name="emp_add"),
     # path("emp_add", views.emp_add, name="emp_add"),
     path("emp_edit/<int:pk>/", EmpEdit.as_view(), name="emp_edit"),
+    # path("emp_edit/<int:pk>/", views.emmp_edit, name="emp_edit"),
     path("emp_delete/<int:pk>", EmpDelete.as_view(), name="emp_delete"),
     # path("emp_delete/<int:pk>/", views.emp_delete, name="emp_delete"),
     path("branch_view", BranchView.as_view(), name="branch_view"),

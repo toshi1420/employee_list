@@ -1,18 +1,25 @@
 {% extends "base.html" %}
+{% block title%}支社登録{% endblock title %}
 {% load widget_tweaks %}
 {% block content %}
 <h3 class="text-center">支社追加</h3>
 <form class="offset-md-3 col-md-6" action="{% url 'branch_add' %}" method="POST">
     {% csrf_token %}
-    <label class="form-label">支社名</label>
-    {% render_field form.name class="form-control" %}
-    <label class="form-label">住所</label>
-    {% render_field form.address class="form-control" %}
-    <label class="form-label">電話番号</label>
-    {% render_field form.tel class="form-control" %}
+    {% for field in form %}
+    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+    {% render_field field class="form-control mb-2" %}
+    {% if field.help_text %}
+    <small class="form-text text-muted">{{ field.help_text }}</small>
+    {% endif %}
+    {% if field.errors %}
+    {% for error in errors %}
+    <small class="text-danger">{{ error }}</small>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
     <div class="d-inline-flex flex-column">
-        <button type="submit" class="btn btn-outline-primary btn-sm mt-2">登録</button>
+        <button type="submit" class="btn btn-outline-primary mt-2">登録</button>
 </form>
-<a class="btn btn-outline-primary btn-sm mt-2 mb-3" href="{% url 'branch_view' %}" role="button">戻る</a>
+<a class="btn btn-outline-primary mt-2 mb-3" href="{% url 'branch_view' %}" role="button">戻る</a>
 </div>
 {% endblock %}
