@@ -34,6 +34,7 @@ class Index(ListView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["form"] = EmpSearchForm(self.request.GET)
+        context["index_page"] = True
         return context
 
     # def get(self, request, *args, **kwargs):
