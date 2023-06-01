@@ -3,22 +3,20 @@
 {% load widget_tweaks %}
 {% block content %}
 <h3 class="text-center">ログイン</h3>
-<form class="offset-md-3 col-md-6 justify-content-center" method="post">
+<form class="offset-md-3 col-md-6" method="post">
     {% csrf_token %}
-    <div>
-        {% for field in form %}
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        {% render_field field class="form-control mb-2" %}
-        {% if field.help_text %}
-        <small class="form-text text-muted">{{ field.help_text }}</small>
-        {% endif %}
-        {% if field.errors %}
-        {% for error in field.errors %}
-        <small class="text-danger">{{ error }}</small>
-        {% endfor %}
-        {% endif %}
-        {% endfor %}
-    </div>
+    {% for field in form %}
+    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+    {% render_field field class="form-control mb-2" %}
+    {% if field.help_text %}
+    <small class="form-text text-muted">{{ field.help_text }}</small>
+    {% endif %}
+    {% if field.errors %}
+    {% for error in field.errors %}
+    <small class="text-danger">{{ error }}</small>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
     <button type="submit" class="btn btn-outline-primary mb-3">ログイン</button>
 </form>
 {% endblock %}

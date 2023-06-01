@@ -3,26 +3,29 @@
 {% load widget_tweaks %}
 {% block content %}
 <h3 class="text-center">社員編集</h3>
-<form class="offset-md-3 col-md-6" method="POST">
+<form class="offset-md-3 col-md-6 justify-content-center" action="{% url 'emp_add' %}" method="POST">
     {% csrf_token %}
-    <label class="form-label">社員番号</label>
-    {% render_field form.emp_id class="form-control" %}
-    <label class="form-label">名前</label>
-    {% render_field form.name class="form-control" %}
-    <label class="form-label">役職</label>
-    {% render_field form.post class="form-control" %}
-    <label class="form-label">入社日</label>
-    {% render_field form.date_of_entry class="form-control" %}
-    <label class="form-label">所属</label>
-    {% render_field form.branch class="form-select" %}
+    {% for field in form %}
+    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+    {% render_field field class="form-control mb-2 "%}
+    {% if field.help_text %}
+    <small class="form-text text-muted">{{ field.help_text }}</small>
+    {% endif %}
+    {% if field.errors %}
+    {% for error in errors %}
+    <small class="text-danger">{{ error }}</small>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
     <div class="d-inline-flex flex-column">
-        <button type="submit" class="btn btn-outline-primary btn-sm mt-2">更新</button>
+        <button type="submit" class="btn btn-outline-primary mt-2">更新</button>
 </form>
-<a class="btn btn-outline-primary btn-sm mt-2" href="{% url 'index' %}">戻る</a>
-<button type="button" class="btn btn-outline-danger btn-sm mt-2 mb-3" data-bs-toggle="modal"
-    data-bs-target="#deleteModal">
+<a class="btn btn-outline-primary mt-2" href="{% url 'index' %}">戻る</a>
+<button type="button" class="btn btn-outline-danger mt-2 mb-3" data-bs-toggle="modal" data-bs-target="#deleteModal">
     削除
 </button>
+</div>
+
 </div>
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel">
     <div class="modal-dialog">
@@ -40,5 +43,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

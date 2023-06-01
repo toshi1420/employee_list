@@ -2,12 +2,25 @@
 {% block title %}
 ユーザー登録
 {% endblock title%}
+{% load widget_tweaks %}
 {% block content %}
-<h3>ユーザー登録</h3>
-<form method="post">
+<h3 class="text-center">ユーザー登録</h3>
+<form class="offset-md-3 col-md-6" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">登録</button>
+    {% for field in form %}
+    <label for="{{ field.id_for_label }}" class="formlabel">{{ field.label }}</label>
+    {% render_field field class="form-control mb-2" %}
+    {% if field.help_text %}
+    <small class="form-text text-muted">{{ field.help_text }}</small>
+    {% endif %}
+    {% if field.errors %}
+    {% for error in field.errors %}
+    <small class="text-danger">{{ error }}</small>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+    <div>
+        <button type="submit" class="btn btn-outline-primary mb-3">登録</button>
+    </div>
 </form>
-<a href="{% url 'login' %}">ログイン</a>
 {% endblock %}
