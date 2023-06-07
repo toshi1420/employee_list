@@ -4,23 +4,18 @@ from employee_list_app.models import Employee, Branch
 
 
 class EmployeeModelTests(TestCase):
-    def setUp(self):
-        b = Branch.objects.create(name="a", address="aa", tel="1111")
-        Employee.objects.create(emp_id=10000, name="上野", post="python", date_of_entry="2010-12-31", branch=b)
-
-    def test_is_count_one(self):
+    def test_is_create(self):
         """レコードが登録されているか
         """
         b = Branch.objects.create(name="a", address="aa", tel="1111")
-        Employee.objects.create(emp_id=10001, name="ueno", post="py", date_of_entry="2012-12-31", branch=b)
-        emp_count = Employee.objects.count()
-        self.assertEqual(emp_count, 2)
+        emp = Employee.objects.create(emp_id=10001, name="ueno", post="py", date_of_entry="2012-12-31", branch=b)
+        self.assertEqual(emp.emp_id, 10001)
 
     def test_saving_and_retrieving_emp(self):
         """内容を指定して保存したデータと、すぐに取り出したデータが同じ値か
         """
         emp = Employee()
-        b = Branch.objects.get(name="a")
+        b = Branch.objects.create(name="a", address="aa", tel="1111")
         emp_id = 10100
         name = "a"
         post = "aa"
@@ -42,17 +37,19 @@ class EmployeeModelTests(TestCase):
         self.assertEqual(acutal.date_of_entry, date_of_entry)
         self.assertEqual(acutal.branch, branch)
 
+    def test_is_delete(self):
+        b = Branch.objects.create(name="a", address="aa", tel="1111")
+        emp = Employee.objects.create(emp_id=10000, name="上野", post="python", date_of_entry="2010-12-31", branch=b)
+        emp.delete()
+        self.assertFalse(Employee.objects.filter(emp_id=10000).exists())
+
 
 class BranchModelTest(TestCase):
-    def setUp(self):
-        Branch.objects.create(name="a", address="aa", tel="1111")
-
-    def test_is_count_one(self):
+    def test_is_create(self):
         """レコードが登録されているか
         """
-        Branch.objects.create(name="b", address="bb", tel="2222")
-        b_count = Branch.objects.count()
-        self.assertEqual(b_count, 2)
+        b = Branch.objects.create(name="a", address="aa", tel="1111")
+        self.assertEqual(b.name, "a")
 
     def test_saveing_and_retrieving_brn(self):
         """内容を指定して登録したデータと、すぐにとり出したデータが同じ値か
@@ -71,3 +68,8 @@ class BranchModelTest(TestCase):
         self.assertEqual(actual.name, name)
         self.assertEqual(actual.address, address)
         self.assertEqual(actual.tel, tel)
+
+    def test_is_delete(self):
+        b = Branch.objects.create(name="c", address="cc", tel="3333")
+        b.delete()
+        self.assertFalse(Branch.objects.filter(name="c").exists())

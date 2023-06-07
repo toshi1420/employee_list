@@ -22,7 +22,7 @@ DEBUG = False
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Tepmpateフォルダへの絶対パスを定義
-TEMPLATE_DIR = BASE_DIR / "Template"
+TEMPLATE_DIR = BASE_DIR / "templates"
 
 # staticフォルダへの絶対パスを定義
 STATIC_DIR = BASE_DIR / "static"
@@ -95,7 +95,7 @@ ROOT_URLCONF = 'employee_list.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR, ],  # 追加
+        'DIRS': [TEMPLATE_DIR,],  # 追加
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,6 +139,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 MESSAGE_TAGS = {
     messages.INFO: 'alert alert-info',

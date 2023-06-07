@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
@@ -21,7 +22,7 @@ class Employee(models.Model):
         10000), MaxValueValidator(19999)], verbose_name="社員番号")
     name = models.CharField(max_length=30, verbose_name="名前")
     post = models.CharField(max_length=30, null=True, blank=True, verbose_name="役職")
-    date_of_entry = models.DateField(verbose_name="入社日")
+    date_of_entry = models.DateField(validators=[MaxValueValidator(date.today())], verbose_name="入社日")
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, verbose_name="支社番号")
 
     def __str__(self):

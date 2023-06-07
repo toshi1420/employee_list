@@ -6,7 +6,7 @@ from django.contrib import messages
 from .models import Employee, Branch
 from .forms import EmpForm, EmpSearchForm, BranchForm
 
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 
 class Index(ListView):
@@ -28,7 +28,7 @@ class Index(ListView):
                 queryset = queryset.filter(name__icontains=name)
             # branch にデータがあれば　branch に一致する　branch を取り出すが、djangoは外部キーフィールドに自動で_idを付けるので branch_id　になる
             if branch:
-                queryset = queryset.filter(branch_id=branch)
+                queryset = queryset.filter(branch=branch)
         return queryset.select_related("branch")
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
@@ -166,6 +166,7 @@ class EmpEdit(UpdateView):
 class EmpDelete(DeleteView):
     model = Employee
     success_url = reverse_lazy("index")
+    template_name = ""
 
     def form_valid(self, form) -> HttpResponse:
         messages.success(self.request, "データを削除しました")
@@ -258,6 +259,7 @@ class BranchAdd(CreateView):
 
 
 class BranchDelete(DeleteView):
+    template_name = ""
     model = Branch
     success_url = reverse_lazy("index")
 
