@@ -6,6 +6,20 @@
             "request": "launch",
             "program": "${file}",
             "justMyCode": true
+        },
+        {
+            "name": "Python: Django",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver",
+                "--settings",
+                "employee_list.settings.local"
+            ],
+            "django": true,
+            "justMyCode": true
         }
     ]
 }

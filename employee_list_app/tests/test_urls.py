@@ -1,4 +1,3 @@
-from urllib.parse import urlparse
 from django.shortcuts import resolve_url
 from django.test import TestCase, Client
 from django.urls import reverse

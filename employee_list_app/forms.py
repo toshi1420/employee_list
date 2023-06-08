@@ -1,6 +1,6 @@
 from datetime import date
 from django import forms
-
+# from django.core.validators import RegexValidator
 from .models import Employee, Branch
 
 
@@ -30,8 +30,12 @@ class EmpSearchForm(forms.ModelForm):
 
 class BranchForm(forms.ModelForm):
     class Meta:
+        # tel_regex = RegexValidator(regex=r'^[0-9]+$', message="電話番号は'-'なしで入力してください")
         # モデル情報と紐付け
         model = Branch
         # 扱うフィールドを指定
         fields = ("name", "address", "tel")
         labels = {"name": "支社名", "address": "住所", "tel": "電話番号"}
+        # widgets = {
+        #     "tel": forms.NumberInput(attrs={"min": 10, "max": 12, "valid": tel_regex})
+        # }

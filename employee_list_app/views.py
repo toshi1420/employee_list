@@ -5,7 +5,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Employee, Branch
 from .forms import EmpForm, EmpSearchForm, BranchForm
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 
@@ -163,10 +164,10 @@ class EmpEdit(UpdateView):
 #         return HttpResponseRedirect(reverse("index"))
 
 
+@method_decorator(require_POST, name="dispatch")
 class EmpDelete(DeleteView):
     model = Employee
     success_url = reverse_lazy("index")
-    template_name = ""
 
     def form_valid(self, form) -> HttpResponse:
         messages.success(self.request, "データを削除しました")
