@@ -7,11 +7,10 @@ from ..forms import BranchForm, EmpForm, EmpSearchForm
 
 class TestEmpForm(TestCase):
     def setUp(self):
-        Branch.objects.create(name="長野支社", address="aa", tel="1111")
+        self.b = Branch.objects.create(name="長野支社", address="aa", tel="1111")
 
     def test_emp_form(self):
-        b = Branch.objects.get(name="長野支社")
-        test_emp = {"emp_id": 10001, "name": "a", "post": "", "date_of_entry": "2020-10-10", "branch":  b.pk}
+        test_emp = {"emp_id": 10001, "name": "a", "post": "", "date_of_entry": "2020-10-10", "branch":  self.b.pk}
         form = EmpForm(test_emp)
         self.assertTrue(form.is_valid())
 

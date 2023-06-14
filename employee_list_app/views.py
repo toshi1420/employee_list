@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Dict
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
@@ -57,9 +58,6 @@ class Index(ListView):
     #         "form": form
     #     }
     #     return render(request, "employee_list/index.html", context)
-
-
-index = Index.as_view()
 
 
 # def index(request):
@@ -188,11 +186,16 @@ class BranchView(ListView):
     template_name = "employee_list/branch_view.html"
     model = Branch
 
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["branch_view_page"] = True
+        return context
 
 # def branch_view(request):
 #     branchs = Branch.objects.all().order_by("id")
 #     return TemplateResponse(request, "employee_list/branch_view.html",
 #                             {"branchs": branchs})
+
 
 class BranchEdit(UpdateView):
     template_name = "employee_list/branch_edit.html"

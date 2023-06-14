@@ -1,11 +1,14 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
             "name": "Python: File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "justMyCode": true
+            "justMyCode": true,
+            "console": "internalConsole",
+            "args": []
         },
         {
             "name": "Python: Django",

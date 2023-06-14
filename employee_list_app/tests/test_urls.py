@@ -1,23 +1,27 @@
 from django.shortcuts import resolve_url
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from employee_list_app.models import Branch, Employee
-from users.models import EmpListUser
+
+User = get_user_model()
 
 
-class TestLoginUrls(TestCase):
-    """ログイン時アクセスできるかをテスト
-    """
-
+class TestMixin(TestCase):
     def setUp(self):
         self.client = Client()
         b = Branch.objects.create(name="a", address="aa", tel="1111")
         self.emp = Employee.objects.create(emp_id=10000, name="上野", post="python",
                                            date_of_entry="2010-12-31", branch=b)
         # test用アカウント作成
-        self.test_user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user@test.com")
+        self.test_user = User.objects.create_user(email="test_user@test.com", password="test_user@test.com")
         # ログイン
         self.client.login(username="test_user@test.com", password="test_user@test.com")
+
+
+class TestLoginUrls(TestMixin, TestCase):
+    """ログイン時アクセスできるかをテスト
+    """
 
     def test_index_url(self):
         res = self.client.get(reverse("index"))
@@ -64,12 +68,6 @@ class TestLoginUrls(TestCase):
 class TestRedirect(TestCase):
     """非ログイン時、ログインページにredirectされるか
     """
-
-    def setUp(self):
-        self.client = Client()
-        b = Branch.objects.create(name="a", address="aa", tel="1111")
-        self.emp = Employee.objects.create(emp_id=10000, name="上野", post="python",
-                                           date_of_entry="2010-12-31", branch=b)
 
     def test_index_url(self):
         res = self.client.get(reverse("index"))

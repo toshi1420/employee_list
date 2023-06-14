@@ -1,18 +1,23 @@
 from datetime import date
 from django.test import TestCase
 from django.urls import reverse
-
-from users.models import EmpListUser
-
-from ..models import Employee, Branch
+from django.contrib.auth import get_user_model
 
 
-class TestIndex(TestCase):
+from employee_list_app.models import Employee, Branch
+
+User = get_user_model()
+
+
+class TestMixin(TestCase):
     def setUp(self):
         self.b = Branch.objects.create(name="a", address="aa", tel="1111")
         Employee.objects.create(emp_id=10000, name="上野", post="python", date_of_entry="2010-12-31", branch=self.b)
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
+        user = User.objects.create_user(email="test_user@test.com", password="test_user123")
         self.client.force_login(user)
+
+
+class TestIndex(TestMixin, TestCase):
 
     def test_get(self):
         """GETアクセス時ステータスコード200かつ、データが表示されているか
@@ -28,11 +33,7 @@ class TestIndex(TestCase):
         self.assertContains(res, "a")
 
 
-class TsetEmpAdd(TestCase):
-    def setUp(self):
-        self.b = Branch.objects.create(name="a", address="aa", tel="1111")
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+class TsetEmpAdd(TestMixin, TestCase):
 
     def test_get(self):
         """GETアクセス時employee_list/emp_add.htmlが使われてるか
@@ -58,7 +59,7 @@ class TestEmpEdit(TestCase):
         self.bn = Branch.objects.create(name="長野支社", address="aa", tel="1111")
         self.bt = Branch.objects.create(name="東京本社", address="bb", tel="2222")
         Employee.objects.create(emp_id=10000, name="佐藤", post="python", date_of_entry="2010-12-31", branch=self.bn)
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
+        user = User.objects.create_user(email="test_user@test.com", password="test_user123")
         self.client.force_login(user)
 
     def test_get(self):
@@ -72,7 +73,9 @@ class TestEmpEdit(TestCase):
         self.assertContains(res, emp.emp_id)
         self.assertContains(res, emp.name)
         self.assertContains(res, emp.post)
-        self.assertContains(res, emp.date_of_entry)
+        self.assertContains(res, emp.date_of_entry.year)
+        self.assertContains(res, emp.date_of_entry.month)
+        self.assertContains(res, emp.date_of_entry.day)
         self.assertContains(res, emp.branch)
 
     def test_emp_edit(self):
@@ -95,12 +98,7 @@ class TestEmpEdit(TestCase):
         self.assertEqual(res.status_code, 404)
 
 
-class TestEmpDelete(TestCase):
-    def setUp(self):
-        self.b = Branch.objects.create(name="a", address="aa", tel="1111")
-        Employee.objects.create(emp_id=10000, name="上野", post="python", date_of_entry="2010-12-31", branch=self.b)
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+class TestEmpDelete(TestMixin, TestCase):
 
     def test_get(self):
         emp = Employee.objects.get(emp_id=10000)
@@ -122,27 +120,18 @@ class TestEmpDelete(TestCase):
         self.assertEqual(res.status_code, 404)
 
 
-class TestBranchView(TestCase):
-    def setUp(self):
-        self.b = Branch.objects.create(name="a", address="bb", tel="1111")
-        Employee.objects.create(emp_id=10000, name="上野", post="python", date_of_entry="2010-12-31", branch=self.b)
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+class TestBranchView(TestMixin, TestCase):
 
     def test_get(self):
         res = self.client.get(reverse("branch_view"))
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, "employee_list/branch_view.html")
         self.assertContains(res, "a")
-        self.assertContains(res, "bb")
+        self.assertContains(res, "aa")
         self.assertContains(res, "1111")
 
 
-class TestBranchEdit(TestCase):
-    def setUp(self):
-        self.b = Branch.objects.create(name="a", address="bb", tel="1111")
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+class TestBranchEdit(TestMixin, TestCase):
 
     def test_get(self):
         url = reverse("branch_edit", kwargs={"pk": self.b.pk})
@@ -170,11 +159,7 @@ class TestBranchEdit(TestCase):
         self.assertEqual(res.status_code, 404)
 
 
-class TestBranchAdd(TestCase):
-    def setUp(self):
-        self.b = Branch.objects.create(name="a", address="bb", tel="1111")
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+class TestBranchAdd(TestMixin, TestCase):
 
     def test_get(self):
         res = self.client.get(reverse("branch_add"))
@@ -190,11 +175,7 @@ class TestBranchAdd(TestCase):
         self.assertEqual(res.url, reverse("index"))
 
 
-class TestBranchDelete(TestCase):
-    def setUp(self):
-        self.b = Branch.objects.create(name="a", address="bb", tel="1111")
-        user = EmpListUser.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+class TestBranchDelete(TestMixin, TestCase):
 
     def test_delete(self):
         url = reverse("branch_delete", kwargs={"pk": self.b.pk})

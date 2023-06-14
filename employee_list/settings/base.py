@@ -54,10 +54,9 @@ INSTALLED_APPS = [
 # django.contrib.sites用のサイト識別IDを設定
 # SITE_ID = 1
 # 認証バックエンドの設定
-# AUTHENTICATION_BACKENDS = [
-#     'allauth.account.auth_backends.AuthenticationBackend',  # 一般ユーザー用(メールアドレス認証)
-#     'django.contrib.auth.backends.ModelBackend',  # 管理サイト用(ユーザー名認証)
-# ]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # 一般ユーザー用(メールアドレス認証)
+]
 
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'  # メールアドレス認証に変更する設定
 # ACCOUNT_USERNAME_REQUIRED = False  # サインナップ、ログイン時のユーザーネーム認証をキャンセル
