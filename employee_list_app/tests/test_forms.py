@@ -25,6 +25,6 @@ class TestEmpSerchForm(TestCase):
 
 class TestBranchForm(TestCase):
     def test_branch_form(self):
-        b = {"name": "長野", "address": "bb", "tel": "22222"}
+        b = {"name": "長野", "address": "bb", "tel": "2222222222"}
         form = BranchForm(b)
         self.assertTrue(form.is_valid())

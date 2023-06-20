@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 class Branch(models.Model):
     name = models.CharField(max_length=30, verbose_name="支社名")
     address = models.CharField(max_length=255, verbose_name="住所")
-    tel_regex = RegexValidator(regex=r'^[0-9]+$', message="電話番号は'-'なしで入力してください")
+    tel_regex = RegexValidator(regex=r'^[0-9]+$')
     tel = models.CharField(validators=[tel_regex], max_length=12, verbose_name="電話番号")
 
     def __str__(self):

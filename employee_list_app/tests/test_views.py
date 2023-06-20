@@ -9,15 +9,13 @@ from employee_list_app.models import Employee, Branch
 User = get_user_model()
 
 
-class TestMixin(TestCase):
+class TestIndex(TestCase):
     def setUp(self):
-        self.b = Branch.objects.create(name="a", address="aa", tel="1111")
-        Employee.objects.create(emp_id=10000, name="上野", post="python", date_of_entry="2010-12-31", branch=self.b)
-        user = User.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
-
-
-class TestIndex(TestMixin, TestCase):
+        self.b = Branch.objects.create(name="a", address="aa", tel="1234567890")
+        self.emp = Employee.objects.create(emp_id=10000, name="上野", post="python",
+                                           date_of_entry=date(2010, 12, 31), branch=self.b)
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
         """GETアクセス時ステータスコード200かつ、データが表示されているか
@@ -33,7 +31,11 @@ class TestIndex(TestMixin, TestCase):
         self.assertContains(res, "a")
 
 
-class TsetEmpAdd(TestMixin, TestCase):
+class TsetEmpAdd(TestCase):
+    def setUp(self):
+        self.b = Branch.objects.create(name="a", address="aa", tel="1234567890")
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
         """GETアクセス時employee_list/emp_add.htmlが使われてるか
@@ -46,9 +48,9 @@ class TsetEmpAdd(TestMixin, TestCase):
     def test_post(self):
         """社員追加しリダイレクトしているか
         """
-        add_data = {"emp_id": 10001, "name": "野", "post": "py", "date_of_entry": "2011-12-31", "branch": self.b.pk}
+        post_data = {"emp_id": 10001, "name": "野", "post": "py", "date_of_entry": "2011-12-31", "branch": self.b.pk}
         url = reverse("emp_add")
-        res = self.client.post(url, add_data)
+        res = self.client.post(url, post_data)
         self.assertEqual(res.status_code, 302)
         self.assertEqual(res.url, url)
         self.assertTrue(Employee.objects.filter(emp_id=10001).exists())
@@ -56,37 +58,37 @@ class TsetEmpAdd(TestMixin, TestCase):
 
 class TestEmpEdit(TestCase):
     def setUp(self):
-        self.bn = Branch.objects.create(name="長野支社", address="aa", tel="1111")
-        self.bt = Branch.objects.create(name="東京本社", address="bb", tel="2222")
-        Employee.objects.create(emp_id=10000, name="佐藤", post="python", date_of_entry="2010-12-31", branch=self.bn)
-        user = User.objects.create_user(email="test_user@test.com", password="test_user123")
-        self.client.force_login(user)
+        self.bn = Branch.objects.create(name="長野支社", address="aa", tel="1234567890")
+        self.bt = Branch.objects.create(name="東京本社", address="bb", tel="1234567890")
+        self.edit_emp = Employee.objects.create(emp_id=10002, name="佐藤", post="python",
+                                                date_of_entry=date(2010, 12, 31), branch=self.bn)
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
         """GETアクセス時ステータスコードが200か
         """
-        emp = Employee.objects.get(emp_id=10000)
-        url = reverse("emp_edit", kwargs={"pk": emp.pk})
+        url = reverse("emp_edit", kwargs={"pk": self.edit_emp.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, "employee_list/emp_edit.html")
-        self.assertContains(res, emp.emp_id)
-        self.assertContains(res, emp.name)
-        self.assertContains(res, emp.post)
-        self.assertContains(res, emp.date_of_entry.year)
-        self.assertContains(res, emp.date_of_entry.month)
-        self.assertContains(res, emp.date_of_entry.day)
-        self.assertContains(res, emp.branch)
+        self.assertContains(res, self.edit_emp.emp_id)
+        self.assertContains(res, self.edit_emp.name)
+        self.assertContains(res, self.edit_emp.post)
+        self.assertContains(res, self.edit_emp.date_of_entry.year)
+        self.assertContains(res, self.edit_emp.date_of_entry.month)
+        self.assertContains(res, self.edit_emp.date_of_entry.day)
+        self.assertContains(res, self.edit_emp.branch)
 
     def test_emp_edit(self):
-        emp = Employee.objects.get(emp_id=10000)
-        edit_data = {"emp_id": 10001, "name": "山田", "post": "", "date_of_entry": "2011-10-10", "branch": self.bt.pk}
-        url = reverse("emp_edit", kwargs={"pk": emp.pk})
+        edit_data = {"emp_id": 10100, "name": "山田", "post": "",
+                     "date_of_entry": date(2011, 10, 10), "branch": self.bt.pk}
+        url = reverse("emp_edit", kwargs={"pk": self.edit_emp.pk})
         res = self.client.post(url, edit_data)
-        edit_emp = Employee.objects.get(pk=emp.pk)
+        edit_emp = Employee.objects.get(pk=self.edit_emp.pk)
         self.assertEqual(res.status_code, 302)
         self.assertEqual(res.url, reverse("index"))
-        self.assertEqual(edit_emp.emp_id, 10001)
+        self.assertEqual(edit_emp.emp_id, 10100)
         self.assertEqual(edit_emp.name, "山田")
         self.assertEqual(edit_emp.post, None)
         self.assertEqual(edit_emp.date_of_entry, date(2011, 10, 10))
@@ -98,21 +100,25 @@ class TestEmpEdit(TestCase):
         self.assertEqual(res.status_code, 404)
 
 
-class TestEmpDelete(TestMixin, TestCase):
+class TestEmpDelete(TestCase):
+    def setUp(self):
+        self.b = Branch.objects.create(name="a", address="aa", tel="1234567890")
+        self.delete_emp = Employee.objects.create(
+            emp_id=10003, name="a", post="", date_of_entry=date(2010, 12, 31), branch=self.b)
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
-        emp = Employee.objects.get(emp_id=10000)
-        url = reverse("emp_delete", kwargs={"pk": emp.pk})
+        url = reverse("emp_delete", kwargs={"pk": self.delete_emp.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 405)
 
     def test_delete(self):
-        emp = Employee.objects.get(emp_id=10000)
-        url = reverse("emp_delete", kwargs={"pk": emp.pk})
+        url = reverse("emp_delete", kwargs={"pk": self.delete_emp.pk})
         res = self.client.post(url)
         self.assertEqual(res.status_code, 302)
         self.assertEqual(res.url, reverse("index"))
-        self.assertFalse(Employee.objects.filter(emp_id=1000).exists())
+        self.assertFalse(Employee.objects.filter(emp_id=10003).exists())
 
     def test_404(self):
         url = reverse("emp_delete", kwargs={"pk": 100})
@@ -120,7 +126,11 @@ class TestEmpDelete(TestMixin, TestCase):
         self.assertEqual(res.status_code, 404)
 
 
-class TestBranchView(TestMixin, TestCase):
+class TestBranchView(TestCase):
+    def setUp(self):
+        Branch.objects.create(name="a", address="aa", tel="1234567890")
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
         res = self.client.get(reverse("branch_view"))
@@ -128,30 +138,34 @@ class TestBranchView(TestMixin, TestCase):
         self.assertTemplateUsed(res, "employee_list/branch_view.html")
         self.assertContains(res, "a")
         self.assertContains(res, "aa")
-        self.assertContains(res, "1111")
+        self.assertContains(res, "1234567890")
 
 
-class TestBranchEdit(TestMixin, TestCase):
+class TestBranchEdit(TestCase):
+    def setUp(self):
+        self.edit_b = Branch.objects.create(name="edit_b", address="edit_b", tel="1234567890")
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
-        url = reverse("branch_edit", kwargs={"pk": self.b.pk})
+        url = reverse("branch_edit", kwargs={"pk": self.edit_b.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, "employee_list/branch_edit.html")
-        self.assertContains(res, self.b.name)
-        self.assertContains(res, self.b.address)
-        self.assertContains(res, self.b.tel)
+        self.assertContains(res, self.edit_b.name)
+        self.assertContains(res, self.edit_b.address)
+        self.assertContains(res, self.edit_b.tel)
 
     def test_edit(self):
-        url = reverse("branch_edit", kwargs={"pk": self.b.pk})
-        edit_data = {"name": "b", "address": "cc", "tel": "2222"}
+        url = reverse("branch_edit", kwargs={"pk": self.edit_b.pk})
+        edit_data = {"name": "edit_b2", "address": "edit_b2", "tel": "12345678901"}
         res = self.client.post(url, edit_data)
-        edit_brn = Branch.objects.get(pk=self.b.pk)
+        edit_brn = Branch.objects.get(pk=self.edit_b.pk)
         self.assertEqual(res.status_code, 302)
         self.assertEqual(res.url, reverse("index"))
-        self.assertEqual(edit_brn.name, "b")
-        self.assertEqual(edit_brn.address, "cc")
-        self.assertEqual(edit_brn.tel, "2222")
+        self.assertEqual(edit_brn.name, "edit_b2")
+        self.assertEqual(edit_brn.address, "edit_b2")
+        self.assertEqual(edit_brn.tel, "12345678901")
 
     def test_404(self):
         url = reverse("branch_edit", kwargs={"pk": 100})
@@ -159,7 +173,10 @@ class TestBranchEdit(TestMixin, TestCase):
         self.assertEqual(res.status_code, 404)
 
 
-class TestBranchAdd(TestMixin, TestCase):
+class TestBranchAdd(TestCase):
+    def setUp(self):
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_get(self):
         res = self.client.get(reverse("branch_add"))
@@ -168,21 +185,25 @@ class TestBranchAdd(TestMixin, TestCase):
 
     def test_branch_add(self):
         url = reverse("branch_add")
-        add_data = {"name": "b", "address": "aa", "tel": "2222"}
-        res = self.client.post(url, add_data)
-        self.assertTrue(Branch.objects.filter(name="b").exists())
+        post_data = {"name": "post_b", "address": "post_b", "tel": "12345678901"}
+        res = self.client.post(url, post_data)
+        self.assertTrue(Branch.objects.filter(name="post_b").exists())
         self.assertEqual(res.status_code, 302)
         self.assertEqual(res.url, reverse("index"))
 
 
-class TestBranchDelete(TestMixin, TestCase):
+class TestBranchDelete(TestCase):
+    def setUp(self):
+        self.delete_b = Branch.objects.create(name="delete_b", address="delete_b", tel="1234567890")
+        User.objects.create_user(email="test@test.com", password="test_user123")
+        self.client.login(email="test@test.com", password="test_user123")
 
     def test_delete(self):
-        url = reverse("branch_delete", kwargs={"pk": self.b.pk})
+        url = reverse("branch_delete", kwargs={"pk": self.delete_b.pk})
         res = self.client.post(url)
         self.assertEqual(res.status_code, 302)
         self.assertEqual(res.url, reverse("index"))
-        self.assertFalse(Branch.objects.filter(name="a").exists())
+        self.assertFalse(Branch.objects.filter(name="delete_b").exists())
 
     def test_404(self):
         url = reverse("branch_delete", kwargs={"pk": 100})

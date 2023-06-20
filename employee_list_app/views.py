@@ -87,6 +87,7 @@ class EmpAdd(CreateView):
     # fromに初期値を渡す
     def get_initial(self):
         initial = super().get_initial()
+        initial["date_of_entry"] = date.today()
         if Employee.objects.exists():
             last_emp_id = Employee.objects.all().order_by("emp_id").last().emp_id + 1
         else:
@@ -131,6 +132,14 @@ class EmpEdit(UpdateView):
     model = Employee
     form_class = EmpForm
     success_url = reverse_lazy("index")
+
+    def get_initial(self):
+        initial = super().get_initial()
+        # 現在のemployeeオブジェクトを取得し格納
+        employee = self.get_object()
+        initial["emp_id"] = employee.emp_id
+        initial["date_of_entry"] = employee.date_of_entry
+        return initial
 
     def form_valid(self, form: EmpForm) -> HttpResponse:
         messages.success(self.request, "更新が完了しました")
@@ -262,8 +271,8 @@ class BranchAdd(CreateView):
 #         return HttpResponseRedirect(reverse("branch_add"))
 
 
+@method_decorator(require_POST, name="dispatch")
 class BranchDelete(DeleteView):
-    template_name = ""
     model = Branch
     success_url = reverse_lazy("index")
 
