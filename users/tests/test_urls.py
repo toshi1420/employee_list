@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
 
 
 class TestLoginUrls(TestCase):
@@ -10,7 +12,7 @@ class TestLoginUrls(TestCase):
     def setUp(self):
         User = get_user_model()
         self.test_user = User.objects.create_user(email="test_user@test.com", password="test_user@test.com")
-        self.client.login(email="test_user@test.com", password="test_user@test.com")
+        self.client.force_login(self.test_user)
 
     def test_login_url(self):
         res = self.client.get(reverse("login"))
@@ -45,13 +47,46 @@ class TestLoginUrls(TestCase):
         self.assertTemplateUsed(res, "registration/password_reset_done.html")
 
     # 実際の操作でアクセスするとURLが　http://127.0.0.1:8000/accounts/reset/Mg/set-password/になる
-    def test_password_reset_confirm_url(self):
+    def test_password_reset_confirm_get(self):
         """パスワード再設定フォーム"""
-        token = PasswordResetTokenGenerator().make_token(self.test_user)
-        res = self.client.get(reverse("password_reset_confirm", kwargs={
-                              "uid64": self.test_user.pk, "token": "set-password"}))
+        # self.token = PasswordResetTokenGenerator().make_token(self.test_user)
+        # urlsafe_b64encode：渡されたバイト文字列を安全なBase64形式にエンコードする　　force_bytes:ユーザーのプライマリキーをバイト文字列に変換
+        self.uid = urlsafe_base64_encode(force_bytes(self.test_user.pk))
+        self.token = default_token_generator.make_token(self.test_user)
+        url = reverse("password_reset_confirm",
+                      kwargs={
+                          "uidb64": self.uid,
+                          "token": self.token})
+        res = self.client.get(url)
         self.assertEqual(res.status_code, 302)
-        self.assertTemplateUsed(res, "registration/password_reset_confirm.html")
+        redirect_url = reverse("password_reset_confirm",
+                               kwargs={
+                                   "uidb64": self.uid,
+                                   "token": "set-password"})
+        self.assertRedirects(res, redirect_url)
+
+    def test_password_reset_confirm_post(self):
+        self.uid = urlsafe_base64_encode(force_bytes(self.test_user.pk))
+        self.token = default_token_generator.make_token(self.test_user)
+        # PasswordResetConfirmViewはget時にトークンをsessionに保存し、post時にsessionのトークンをチェックしているため
+        # 初めにgetリクエストを投げる
+        get_url = reverse("password_reset_confirm",
+                          kwargs={
+                              "uidb64": self.uid,
+                              "token": self.token})
+        self.client.get(get_url)
+        # 次にpoatを投げる
+        # SetPasswordFormのフィールドはnew_passwordになっている
+        post_data = {
+            "new_password1": "reset_password",
+            "new_password2": "reset_password"
+        }
+        url = reverse("password_reset_confirm",
+                      kwargs={
+                          "uidb64": self.uid,
+                          "token": "set-password"})
+        res = self.client.post(url, post_data)
+        self.assertRedirects(res, reverse("password_reset_complete"))
 
     def test_password_reset_complete_url(self):
         """パスワード再設定 完了"""
@@ -96,11 +131,21 @@ class TestLogoutAccess(TestCase):
     def test_password_reset_confirm_url(self):
         """パスワード再設定"""
         User = get_user_model()
-        test_user = User.objects.create_user(email="test_user@test.com", password="test_user@test.com")
-        token = PasswordResetTokenGenerator().make_token(test_user)
-        res = self.client.get(reverse("password_reset_confirm", kwargs={"uid64": test_user.pk, "token": token}))
-        self.assertEqual(res.status_code, 302)
-        self.assertTemplateUsed(res, "registration/password_reset_confirm.html")
+        test_user = User.objects.create_user(email="test_user@test.com", password="password_test")
+
+        uid = urlsafe_base64_encode(force_bytes(test_user.pk))
+        token = default_token_generator.make_token(test_user)
+        get_url = reverse("password_reset_confirm",
+                          kwargs={"uidb64": uid,
+                                  "token": token})
+
+        res = self.client.get(get_url)
+
+        url = reverse("password_reset_confirm",
+                      kwargs={
+                          "uidb64": uid,
+                          "token": "set-password"})
+        self.assertRedirects(res, url)
 
     def test_password_reset_complete_url(self):
         """パスワード再設定 完了"""
